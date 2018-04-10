@@ -1,0 +1,28 @@
+<p>This is idea page</p>
+
+<% @ideas.each do |idea|  %>
+<%  count = 0 %>
+
+<h4><%= link_to idea.title, idea_path(idea) %> </h4>
+<a href="#" id="trigger"> folding </a>
+<br/>
+
+<div id="test" class="hidden">
+  <%= idea.description %>
+  <h4> member <%= idea.join_count %> </h4>
+  <h4> like <%= idea.like_count %> </h4>
+</div>
+
+<% count+=1 %>
+
+<hr>
+<% end %>
+
+<script>
+$(function() {
+  $(`a#trigger`).click(function(event){
+    event.preventDefault()
+    $(`div#test`).toggle()
+  })
+})
+</script>

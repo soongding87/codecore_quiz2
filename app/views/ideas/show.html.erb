@@ -1,0 +1,79 @@
+<h1><%= @idea.title %></h1>
+<p><%= @idea.description %></p>
+
+<p>By <%= @idea.user&.full_name || "[DELETED]" %></p>
+
+<% if user_signed_in? %>
+  <% if can? :edit, @idea %>
+    <%= link_to 'Edit', edit_idea_path(@idea) %>
+  <% end %>
+  <%# method: :delete will use JS to submit a `delete` request instead of GET
+      one for links %>
+  <% if can? :delete, @idea %>
+    <%= link_to 'Delete',
+      idea_path(@idea),
+      method: :delete,
+      data: { confirm: 'Are you sure?' }
+    %>
+  <% end %>
+<% end %>
+
+<h2>Reviews</h2>
+
+<%#
+  When using form_for for model that belongs to another,
+  you can specify that relationship in the form arguments
+  using an array where the first element of the array
+  is the parent resource for the second element.
+
+  For example:
+    For [@question, Answer.new], form_for will use the path
+    question_answers_path.
+%>
+
+<% if user_signed_in? %>
+  <%= form_for [@idea, @review] do |f| %>
+    <p class="form-errors">
+      <%= @review.errors.full_messages.join(', ') %>
+    </p>
+
+    <div>
+      <%= f.text_area :body,
+        placeholder: "What's on your mind?",
+        cols: 60, rows: 4
+      %>
+    </div>
+    <%= f.submit "Submit" %>
+  <% end %>
+<% end %>
+
+<ul class="answer-list">
+  <% @reviews.each do |review| %>
+    <li>
+      <p>
+        <strong>
+          <%= review.user&.full_name || "[DELETED]" %> commented:
+        </strong>
+        <br/>
+
+        <%= review.body %> <br />
+
+        <small>
+          reviewed <%= time_ago_in_words(review.created_at) %> ago
+        </small>
+        <% if user_signed_in? && can?(:delete, review) %>
+          •
+          <small>
+            <%= link_to "Delete",
+              review_path(review),
+              method: :delete,
+              data: {
+                confirm: "Are you sure?"
+              }
+            %>
+          </small>
+        <% end %>
+      </p>
+    </li>
+  <% end %>
+</ul>
